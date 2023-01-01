@@ -1,6 +1,6 @@
 {
   "name": "coyote2",
-  "version": "0.0.12",
+  "version": "0.0.14",
   "description": "A Lightweight Web UI Framework",
   "type": "module",
   "exports": {
@@ -27,5 +27,12 @@
     "@babel/plugin-transform-parameters": "^7.20.7",
     "@babel/preset-env": "^7.20.2",
     "babelify": "^10.0.0"
-  }
+  },
+  "keywords": [
+    "react",
+    "reactjs",
+    "web",
+    "webui",
+    "ui"
+  ]
 }
