@@ -113,6 +113,7 @@ this.setState(state => {state.count += 1});
 ```
 
 ### reactjs
+Example:
 ```javascript
 // Create a new state and pass it to setState
 this.setState({count:state.count+1});
