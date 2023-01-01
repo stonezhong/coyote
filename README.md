@@ -71,7 +71,7 @@ const MyPage = componentFactory(class MyPage extends Component {
     }
 
     render() {
-        return DIV(,
+        return DIV(
             P({style: 'color:red;'}, `Clicked ${this.state.count} times`),
             BUTTON({onclick: this.clickHandler}, 
                 ">> click me <<"
