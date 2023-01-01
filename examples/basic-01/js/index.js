@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import {Component, componentFactory, renderRootDomElement} from "./coyote";
+import {Component, componentFactory, renderRootDomElement} from "coyote2";
 
 const MyPage = componentFactory(class extends Component {
     state = {

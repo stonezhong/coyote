@@ -6,7 +6,7 @@ import _ from "lodash";
 function renderToPrimitive(element) {
     let renderedBy = null;
     let renderedElement = element;
-    while (!renderedElement._isPrimitive) {
+    while (!renderedElement.isPrimitive) {
         renderedElement = renderedElement.render();
         renderedElement.renderedBy = renderedBy;
         renderedBy = renderedElement;
@@ -59,7 +59,7 @@ export function updateDomElement(element, parentDomElement, cachedDomElement) {
     }
 
     // cannot reuse cached DOM
-    const domElement = primitiveElement._getDomElement();
+    const domElement = primitiveElement._createDomElement();
     originalElement._domElement = domElement;
     for (const childElement of primitiveElement.children) {
         updateDomElement(childElement, domElement, null);

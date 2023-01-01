@@ -1,12 +1,19 @@
 {
-  "name": "coyote",
-  "version": "0.0.1",
+  "name": "coyote2",
+  "version": "0.0.7",
   "description": "A Lightweight Web UI Framework",
-  "main": "index.js",
+  "main": "dist/index.js",
   "author": "Stone Zhong",
   "license": "ISC",
   "dependencies": {
     "immer": "^9.0.16",
     "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.20.7",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-transform-parameters": "^7.20.7",
+    "@babel/preset-env": "^7.20.2",
+    "babelify": "^10.0.0"
   }
 }

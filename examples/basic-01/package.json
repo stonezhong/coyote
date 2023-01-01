@@ -18,6 +18,6 @@
   "author": "Stone Zhong",
   "license": "MIT",
   "dependencies": {
-    "coyote": "file:../../src"
+    "jquery": "^3.6.3"
   }
 }

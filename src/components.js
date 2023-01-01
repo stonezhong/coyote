@@ -9,7 +9,7 @@ export class Component {
     state = {}
     parent = null;
 
-    _isPrimitive = false;             // only true for component like div, p, table, etc...
+    isPrimitive = false;             // true for primitive element
     _domElement = null;
     renderedBy = null;                // other component that renders this component
 
@@ -31,9 +31,9 @@ export class Component {
 class NullComponent extends Component {
     constructor(text) {
         super({}, []);
-        this._isPrimitive = true;
+        this.isPrimitive = true;
     }
-    _getDomElement() {
+    _createDomElement() {
         return document.createComment("for null component");
     }
     _updateDomElement(domElement) {
@@ -47,9 +47,9 @@ class TextComponent extends Component {
     constructor(text) {
         super({}, []);
         this._text = text;
-        this._isPrimitive = true;
+        this.isPrimitive = true;
     }
-    _getDomElement() {
+    _createDomElement() {
         return document.createTextNode(this._text);
     }
     _updateDomElement(domElement) {
@@ -84,12 +84,12 @@ function _primitiveComponent(tag) {
             for (const child of this.children) {
                 child.parent = this;
             }
-            this._isPrimitive = true;
+            this.isPrimitive = true;
         }
         _canReuse(domElement) {
             return domElement.nodeName.toLowerCase() === tag;
         }
-        _getDomElement() {
+        _createDomElement() {
             const ele = document.createElement(tag);
             for (const key in this.props) {
                 const value = this.props[key];
