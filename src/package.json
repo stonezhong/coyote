@@ -1,10 +1,14 @@
 {
   "name": "coyote2",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A Lightweight Web UI Framework",
   "main": "dist/index.js",
   "author": "Stone Zhong",
   "license": "ISC",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./build.sh"
+  },
   "dependencies": {
     "immer": "^9.0.16",
     "lodash": "^4.17.21"

@@ -12,12 +12,14 @@
     "http-server": "^14.1.1"
   },
   "scripts": {
-    "build": "./build.sh",
-    "start": "http-server . -p 8080"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server . -p 8080",
+    "build": "./build.sh"
   },
   "author": "Stone Zhong",
   "license": "MIT",
   "dependencies": {
+    "coyote2": "^0.0.9",
     "jquery": "^3.6.3"
   }
 }
