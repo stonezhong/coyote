@@ -1,21 +1,42 @@
 import _ from "lodash";
 import produce from "immer"
 
-import {updateDomElementForElement} from "./utils";
+import {renderElementAndUpdateDom} from "./utils";
+import {
+    DEBUG_CREATE_TEXT_NODE, DEBUG_UPDATE_TEXT_NODE, DEBUG_CREATE_NULL_NODE,
+    DEBUG_DOM_ATTR_SET, DEBUG_DOM_ATTR_REMOVE,
+    DEBUG_DOM_CREATE
+} from "./debug";
 
 const eventHandlerProps = new Set(['onclick']);
 
+/***********************************************************************************************
+ * element                          an instance of component
+ * primitive element                an element whose isPrimitive is true. They can only come from 
+ *                                  NullComponent, TextComponent or PrimitiveComponent
+ *                                  We also consider primitive element to be "virtual DOM"
+ * _domElement                      only primitive element has _domElement, they point to the DOM 
+ *                                  element a primitive element referes to
+ * 
+ *              
+ * 
+ */
+
 export class Component {
     state = {}
-    parent = null;
+    parent = null;                  // points to the parent element
 
     isPrimitive = false;             // true for primitive element
-    _domElement = null;
-    renderedBy = null;                // other component that renders this component
+    renderedBy = null;               // other element that produce this element via render()
+    renderedTo = null;               // the element this element renders to via render()
 
     constructor(props, children) {
-        this.props = props;
-        this.children = children;
+        this.props = props;          // always a raw object, e.g. {x: 1, y: 2}
+        this.children = children;    // an array
+    }
+
+    toString() {
+        return `${this.constructor.name}`;
     }
 
     getState() {
@@ -24,46 +45,64 @@ export class Component {
 
     setState(changer) {
         this.state = produce(this.state, changer);
-        updateDomElementForElement(this);
+        renderElementAndUpdateDom(this);
     }
 }
 
 class NullComponent extends Component {
+    // this is usually act as placeholder for null or false for 
+    _domElement = null;
+
     constructor(text) {
         super({}, []);
         this.isPrimitive = true;
     }
+
+    toString() {
+        return `Null`;
+    }
+
     _createDomElement() {
+        DEBUG_CREATE_NULL_NODE();
         return document.createComment("for null component");
     }
-    _updateDomElement(domElement) {
+    _updateDomElement(cachedElement, domElement) {
     }
-    _canReuse(domElement) {
-        return domElement.nodeName === "#comment";
+    getTagName() {
+        return "#comment";
     }
 };
 
 class TextComponent extends Component {
+    _domElement = null;
+
     constructor(text) {
         super({}, []);
         this._text = text;
         this.isPrimitive = true;
     }
+    toString() {
+        return `Text(${this._text})`;
+    }
     _createDomElement() {
+        DEBUG_CREATE_TEXT_NODE(this._text);
         return document.createTextNode(this._text);
     }
-    _updateDomElement(domElement) {
-        if (domElement.nodeValue !== this._text) {
+    _updateDomElement(cachedElement, domElement) {
+        if (this._text !== cachedElement._text) {
+            DEBUG_UPDATE_TEXT_NODE(this._text);
             domElement.nodeValue = this._text;
         }
     }
-    _canReuse(domElement) {
-        return domElement.nodeName === "#text";
+    getTagName() {
+        return "#text";
     }
 };
 
 function _primitiveComponent(tag) {
     class PrimitiveComponent extends Component {
+        _domElement = null;
+
         constructor(props, children) {
             super(props, children.map(
                 child => {
@@ -86,46 +125,65 @@ function _primitiveComponent(tag) {
             }
             this.isPrimitive = true;
         }
-        _canReuse(domElement) {
-            return domElement.nodeName.toLowerCase() === tag;
+
+        toString() {
+            return tag;
         }
-        _createDomElement() {
-            const ele = document.createElement(tag);
-            for (const key in this.props) {
-                const value = this.props[key];
-                if (eventHandlerProps.has(key)) {
-                    ele[key] = value;
-                } else {
-                    ele.setAttribute(key, value);
-                }
+    
+        getTagName() {
+            return tag;
+        }
+
+        _set_dom_attr(domElement, attrName, attrValue) {
+            DEBUG_DOM_ATTR_SET(domElement, attrName, attrValue);
+            if (eventHandlerProps.has(attrName)) {
+                domElement[attrName] = attrValue;
+            } else {
+                domElement.setAttribute(attrName, attrValue);
             }
-            return ele;
         }
-        _updateDomElement(domElement) {
-            const attrNames = domElement.getAttributeNames();
-            // remove unwanted attributes from DOM
-            for (const attrName of attrNames) {
-                if (!(attrName in this.props)) {
-                    if (eventHandlerProps.has(attrName)) {
-                        domElement[attrName] = null;
-                    } else {
-                        domElement.removeAttribute(attrName);
-                    }
+
+        _remove_dom_attr(domElement, attrName) {
+            DEBUG_DOM_ATTR_REMOVE(domElement, attrName);
+            if (eventHandlerProps.has(attrName)) {
+                domElement[attrName] = null;
+            } else {
+                domElement.removeAttribute(attrName);
+            }
+        }
+
+        _createDomElement() {
+            DEBUG_DOM_CREATE(tag);
+            const domElement = document.createElement(tag);
+            for (const key in this.props) {
+                this._set_dom_attr(domElement, key, this.props[key]);
+            }
+            return domElement;
+        }
+
+        _updateDomElement(cachedElement, domElement) {
+            const prevPropKeys = new Set(Object.keys(cachedElement.props));
+            const propKeys = new Set(Object.keys(this.props));
+
+            for (let key of Object.keys(cachedElement.props)) {
+                if (!propKeys.has(key)) {
+                    this._remove_dom_attr(domElement, key);
                 }
             }
 
-            for (const attrName in this.props) {
-                const attrValue = this.props[attrName];
-                if (eventHandlerProps.has(attrName)) {
-                    domElement[attrName] = attrValue;
-                } else {
-                    if (domElement.getAttribute(attrName) !== attrValue) {
-                        domElement.setAttribute(attrName, attrValue);
+            for (let key of Object.keys(this.props)) {
+                const value = this.props[key];
+                if (prevPropKeys.has(key)) {
+                    if (cachedElement.props[key] !== value) {
+                        this._set_dom_attr(domElement, key, value);
                     }
+                } else {
+                    this._set_dom_attr(domElement, key, value);
                 }
             }
         }
         render() {
+            throw new Error("render should never be called on primitive element!");
         }
     }
     return PrimitiveComponent;

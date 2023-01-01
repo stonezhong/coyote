@@ -7,6 +7,7 @@ exports.componentFactory = exports.Component = void 0;
 var _lodash = _interopRequireDefault(require("lodash"));
 var _immer = _interopRequireDefault(require("immer"));
 var _utils = require("./utils");
+var _debug = require("./debug");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
@@ -26,22 +27,41 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var eventHandlerProps = new Set(['onclick']);
-var Component = /*#__PURE__*/function () {
-  // true for primitive element
 
-  // other component that renders this component
+/***********************************************************************************************
+ * element                          an instance of component
+ * primitive element                an element whose isPrimitive is true. They can only come from 
+ *                                  NullComponent, TextComponent or PrimitiveComponent
+ *                                  We also consider primitive element to be "virtual DOM"
+ * _domElement                      only primitive element has _domElement, they point to the DOM 
+ *                                  element a primitive element referes to
+ * 
+ *              
+ * 
+ */
+var Component = /*#__PURE__*/function () {
+  // points to the parent element
+
+  // true for primitive element
+  // other element that produce this element via render()
+  // the element this element renders to via render()
 
   function Component(props, children) {
     _classCallCheck(this, Component);
     _defineProperty(this, "state", {});
     _defineProperty(this, "parent", null);
     _defineProperty(this, "isPrimitive", false);
-    _defineProperty(this, "_domElement", null);
     _defineProperty(this, "renderedBy", null);
-    this.props = props;
-    this.children = children;
+    _defineProperty(this, "renderedTo", null);
+    this.props = props; // always a raw object, e.g. {x: 1, y: 2}
+    this.children = children; // an array
   }
   _createClass(Component, [{
+    key: "toString",
+    value: function toString() {
+      return "".concat(this.constructor.name);
+    }
+  }, {
     key: "getState",
     value: function getState() {
       return this.state;
@@ -50,7 +70,7 @@ var Component = /*#__PURE__*/function () {
     key: "setState",
     value: function setState(changer) {
       this.state = (0, _immer["default"])(this.state, changer);
-      (0, _utils.updateDomElementForElement)(this);
+      (0, _utils.renderElementAndUpdateDom)(this);
     }
   }]);
   return Component;
@@ -59,25 +79,34 @@ exports.Component = Component;
 var NullComponent = /*#__PURE__*/function (_Component) {
   _inherits(NullComponent, _Component);
   var _super = _createSuper(NullComponent);
+  // this is usually act as placeholder for null or false for 
+
   function NullComponent(text) {
     var _this;
     _classCallCheck(this, NullComponent);
     _this = _super.call(this, {}, []);
+    _defineProperty(_assertThisInitialized(_this), "_domElement", null);
     _this.isPrimitive = true;
     return _this;
   }
   _createClass(NullComponent, [{
+    key: "toString",
+    value: function toString() {
+      return "Null";
+    }
+  }, {
     key: "_createDomElement",
     value: function _createDomElement() {
+      (0, _debug.DEBUG_CREATE_NULL_NODE)();
       return document.createComment("for null component");
     }
   }, {
     key: "_updateDomElement",
-    value: function _updateDomElement(domElement) {}
+    value: function _updateDomElement(cachedElement, domElement) {}
   }, {
-    key: "_canReuse",
-    value: function _canReuse(domElement) {
-      return domElement.nodeName === "#comment";
+    key: "getTagName",
+    value: function getTagName() {
+      return "#comment";
     }
   }]);
   return NullComponent;
@@ -90,26 +119,34 @@ var TextComponent = /*#__PURE__*/function (_Component2) {
     var _this2;
     _classCallCheck(this, TextComponent);
     _this2 = _super2.call(this, {}, []);
+    _defineProperty(_assertThisInitialized(_this2), "_domElement", null);
     _this2._text = text;
     _this2.isPrimitive = true;
     return _this2;
   }
   _createClass(TextComponent, [{
+    key: "toString",
+    value: function toString() {
+      return "Text(".concat(this._text, ")");
+    }
+  }, {
     key: "_createDomElement",
     value: function _createDomElement() {
+      (0, _debug.DEBUG_CREATE_TEXT_NODE)(this._text);
       return document.createTextNode(this._text);
     }
   }, {
     key: "_updateDomElement",
-    value: function _updateDomElement(domElement) {
-      if (domElement.nodeValue !== this._text) {
+    value: function _updateDomElement(cachedElement, domElement) {
+      if (this._text !== cachedElement._text) {
+        (0, _debug.DEBUG_UPDATE_TEXT_NODE)(this._text);
         domElement.nodeValue = this._text;
       }
     }
   }, {
-    key: "_canReuse",
-    value: function _canReuse(domElement) {
-      return domElement.nodeName === "#text";
+    key: "getTagName",
+    value: function getTagName() {
+      return "#text";
     }
   }]);
   return TextComponent;
@@ -136,6 +173,7 @@ function _primitiveComponent(tag) {
         }
         throw new Error("Invalid child: ".concat(child));
       }));
+      _defineProperty(_assertThisInitialized(_this3), "_domElement", null);
       var _iterator = _createForOfIteratorHelper(_this3.children),
         _step;
       try {
@@ -152,61 +190,73 @@ function _primitiveComponent(tag) {
       return _this3;
     }
     _createClass(PrimitiveComponent, [{
-      key: "_canReuse",
-      value: function _canReuse(domElement) {
-        return domElement.nodeName.toLowerCase() === tag;
+      key: "toString",
+      value: function toString() {
+        return tag;
+      }
+    }, {
+      key: "getTagName",
+      value: function getTagName() {
+        return tag;
+      }
+    }, {
+      key: "_set_dom_attr",
+      value: function _set_dom_attr(domElement, attrName, attrValue) {
+        (0, _debug.DEBUG_DOM_ATTR_SET)(domElement, attrName, attrValue);
+        if (eventHandlerProps.has(attrName)) {
+          domElement[attrName] = attrValue;
+        } else {
+          domElement.setAttribute(attrName, attrValue);
+        }
+      }
+    }, {
+      key: "_remove_dom_attr",
+      value: function _remove_dom_attr(domElement, attrName) {
+        (0, _debug.DEBUG_DOM_ATTR_REMOVE)(domElement, attrName);
+        if (eventHandlerProps.has(attrName)) {
+          domElement[attrName] = null;
+        } else {
+          domElement.removeAttribute(attrName);
+        }
       }
     }, {
       key: "_createDomElement",
       value: function _createDomElement() {
-        var ele = document.createElement(tag);
+        (0, _debug.DEBUG_DOM_CREATE)(tag);
+        var domElement = document.createElement(tag);
         for (var key in this.props) {
-          var value = this.props[key];
-          if (eventHandlerProps.has(key)) {
-            ele[key] = value;
-          } else {
-            ele.setAttribute(key, value);
-          }
+          this._set_dom_attr(domElement, key, this.props[key]);
         }
-        return ele;
+        return domElement;
       }
     }, {
       key: "_updateDomElement",
-      value: function _updateDomElement(domElement) {
-        var attrNames = domElement.getAttributeNames();
-        // remove unwanted attributes from DOM
-        var _iterator2 = _createForOfIteratorHelper(attrNames),
-          _step2;
-        try {
-          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-            var _attrName = _step2.value;
-            if (!(_attrName in this.props)) {
-              if (eventHandlerProps.has(_attrName)) {
-                domElement[_attrName] = null;
-              } else {
-                domElement.removeAttribute(_attrName);
-              }
-            }
+      value: function _updateDomElement(cachedElement, domElement) {
+        var prevPropKeys = new Set(Object.keys(cachedElement.props));
+        var propKeys = new Set(Object.keys(this.props));
+        for (var _i = 0, _Object$keys = Object.keys(cachedElement.props); _i < _Object$keys.length; _i++) {
+          var key = _Object$keys[_i];
+          if (!propKeys.has(key)) {
+            this._remove_dom_attr(domElement, key);
           }
-        } catch (err) {
-          _iterator2.e(err);
-        } finally {
-          _iterator2.f();
         }
-        for (var attrName in this.props) {
-          var attrValue = this.props[attrName];
-          if (eventHandlerProps.has(attrName)) {
-            domElement[attrName] = attrValue;
-          } else {
-            if (domElement.getAttribute(attrName) !== attrValue) {
-              domElement.setAttribute(attrName, attrValue);
+        for (var _i2 = 0, _Object$keys2 = Object.keys(this.props); _i2 < _Object$keys2.length; _i2++) {
+          var _key = _Object$keys2[_i2];
+          var value = this.props[_key];
+          if (prevPropKeys.has(_key)) {
+            if (cachedElement.props[_key] !== value) {
+              this._set_dom_attr(domElement, _key, value);
             }
+          } else {
+            this._set_dom_attr(domElement, _key, value);
           }
         }
       }
     }, {
       key: "render",
-      value: function render() {}
+      value: function render() {
+        throw new Error("render should never be called on primitive element!");
+      }
     }]);
     return PrimitiveComponent;
   }(Component);
@@ -214,8 +264,8 @@ function _primitiveComponent(tag) {
 }
 var componentFactory = function componentFactory(type) {
   return function () {
-    for (var _len = arguments.length, children = new Array(_len), _key = 0; _key < _len; _key++) {
-      children[_key] = arguments[_key];
+    for (var _len = arguments.length, children = new Array(_len), _key2 = 0; _key2 < _len; _key2++) {
+      children[_key2] = arguments[_key2];
     }
     if (children.length == 0) {
       return new type({}, []);

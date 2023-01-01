@@ -1,6 +1,6 @@
 {
   "name": "coyote2",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A Lightweight Web UI Framework",
   "main": "dist/index.js",
   "author": "Stone Zhong",

@@ -1,88 +1,149 @@
 import _ from "lodash";
 
-
-// render an element until it becomes a primitive element
-// while it's children could still be non primitive element
-function renderToPrimitive(element) {
-    let renderedBy = null;
-    let renderedElement = element;
-    while (!renderedElement.isPrimitive) {
-        renderedElement = renderedElement.render();
-        renderedElement.renderedBy = renderedBy;
-        renderedBy = renderedElement;
-    }
-    return renderedElement;
-}
+import {debug_options, DEBUG_DOM_REMOVE, DEBUG_DOM_REPLACE} from "./debug";
 
 
-// render a DOM element with a component
-export function renderRootDomElement(domElement, element) {
-    updateDomElement(element, domElement, null);
-}
-
-// render an element, it was previously cached at cachedDomElement
-export function updateDomElement(element, parentDomElement, cachedDomElement) {
+// pure primite element tree are considered DOM equivalent
+// return the before and after pure primite element tree so we know the diff
+function renderElement(element) {
+    let currentElement = element;
     
-    const primitiveElement = renderToPrimitive(element);
-    const originalElement = getOriginalElement(element);
+    // get the pureElement before the change
+    while (!currentElement.isPrimitive) {
+        currentElement = currentElement.renderedTo;
+    }
+    let prevVDomRoot = currentElement;
+    let nextVDOMRoot = renderElementRecursive(element);
 
-    if (!_.isNull(cachedDomElement) && primitiveElement._canReuse(cachedDomElement)) {
-        originalElement._domElement = cachedDomElement;
-        let childIndex = 0, childDomElement = cachedDomElement.firstChild, nextChildDomElement = null;
-        for (;;) {
-            if (childIndex >= primitiveElement.children.length) {
-                break;
-            }
-            // need to get this before we replace childDomElement
-            nextChildDomElement = _.isNull(childDomElement)?null:childDomElement.nextSibling;
+    return [prevVDomRoot, nextVDOMRoot];
+}
 
-            const childElement = primitiveElement.children[childIndex];
-            updateDomElement(childElement, cachedDomElement, childDomElement);
 
-            childIndex += 1;
-            childDomElement = nextChildDomElement;
+// we will get a new root points to the pure primitive element tree
+function renderElementRecursive(element) {
+    let currentElement = element;
+   
+    while (!currentElement.isPrimitive) {
+        const nextElement = currentElement.render();
+        nextElement.parent = currentElement.parent;
+        nextElement.renderedBy = currentElement;
+        currentElement.renderedTo = nextElement;
+        currentElement = nextElement;
+    }
+
+    currentElement.children = currentElement.children.map(renderElementRecursive);
+
+    return currentElement;
+}
+
+function createDomElementRecursive(purePrimitiveElement) {
+    const domElement = purePrimitiveElement._createDomElement();
+    purePrimitiveElement._domElement = domElement;
+    for (const childElement of purePrimitiveElement.children) {
+        domElement.appendChild(createDomElementRecursive(childElement));
+    }
+    return domElement;
+}
+
+function applyDiff(prevPurePrimitiveElement, nextPurePrimitiveElement, parentDomElement, domElement, debugPrefix='') {
+    const debugApplyDiff = debug_options['applyDiff'];
+
+    if (debugApplyDiff) {
+        console.log(`${debugPrefix}[applyDiff]: enter, actual VDOM=${prevPurePrimitiveElement}, expect VDOM=${nextPurePrimitiveElement}, parentDom=${parentDomElement?parentDomElement.nodeName:'null'}, dom=${domElement?domElement.nodeName:'null'}`);
+    }
+
+    if (_.isNull(domElement)) {
+        parentDomElement.appendChild(
+            createDomElementRecursive(nextPurePrimitiveElement)
+        )
+        if (debugApplyDiff) {
+            console.log(`${debugPrefix}[applyDiff]: exit`)
         }
-
-        // apply attribute change
-
-        // delete the remaining nodes
-        const domElementToDeleteList = [];
-        while (!_.isNull(childDomElement)) {
-            domElementToDeleteList.push(childDomElement);
-            childDomElement = childDomElement.nextSibling;
-        }
-        for (const domElementToDelete of domElementToDeleteList) {
-            cachedDomElement.removeChild(domElementToDelete);
-        }
-        primitiveElement._updateDomElement(cachedDomElement);
         return;
     }
 
-    // cannot reuse cached DOM
-    const domElement = primitiveElement._createDomElement();
-    originalElement._domElement = domElement;
-    for (const childElement of primitiveElement.children) {
-        updateDomElement(childElement, domElement, null);
-    }
-    if (_.isNull(cachedDomElement)) {
-        parentDomElement.appendChild(domElement);
+    if (prevPurePrimitiveElement.getTagName() === nextPurePrimitiveElement.getTagName()) {
+        if (debugApplyDiff) {
+            console.log(`${debugPrefix}[applyDiff]: reuse, tag is ${prevPurePrimitiveElement.getTagName()}`);
+        }
+        // we will reuse the DOM
+        nextPurePrimitiveElement._updateDomElement(prevPurePrimitiveElement, domElement);
+        nextPurePrimitiveElement._domElement = domElement;
+
+        const commonChildrenLen = Math.min(prevPurePrimitiveElement.children.length, nextPurePrimitiveElement.children.length);
+        if (debugApplyDiff) {
+            console.log(`${debugPrefix}[applyDiff]: actual VDOM has ${prevPurePrimitiveElement.children.length} children, expect VDOM has ${nextPurePrimitiveElement.children.length} children`);
+        }
+        for (let i of _.range(commonChildrenLen)) {
+            applyDiff(
+                prevPurePrimitiveElement.children[i],
+                nextPurePrimitiveElement.children[i],
+                domElement,
+                prevPurePrimitiveElement.children[i]._domElement,
+                debugPrefix+'    '
+            )
+        }
+
+        for (let i = commonChildrenLen; i < nextPurePrimitiveElement.children.length; i ++) {
+            const childElement = nextPurePrimitiveElement.children[i];
+            applyDiff(null, childElement, domElement, null, debugPrefix+'    ');
+        }
+
+        for (let i = commonChildrenLen; i < prevPurePrimitiveElement.children.length; i ++) {
+            DEBUG_DOM_REMOVE(domElement, domElement.lastChild);
+            domElement.removeChild(domElement.lastChild);
+        }
     } else {
-        parentDomElement.replaceChild(domElement, cachedDomElement);
+        if (debugApplyDiff) {
+            console.log(`${debugPrefix}[applyDiff]: cannot reuse, expect tag: ${nextPurePrimitiveElement.getTagName()}, actual tag: ${prevPurePrimitiveElement.getTagName()}`);
+        }
+        // cannot reuse the DOM
+        const newDomElement = nextPurePrimitiveElement._createDomElement();
+        nextPurePrimitiveElement._domElement = newDomElement;
+        for (const childElement of nextPurePrimitiveElement.children) {
+            applyDiff(null, childElement, newDomElement, null, debugPrefix+'    ');
+        }
+        DEBUG_DOM_REPLACE(domElement.parentNode, domElement, newDomElement);
+        domElement.parentNode.replaceChild(newDomElement, domElement);
     }
-    return;
+    if (debugApplyDiff) {
+        console.log(`${debugPrefix}[applyDiff]: exit`)
+    }
 }
 
-// update an element's DOM render after element is updated
-export function updateDomElementForElement(element) {
-    const originalElement = getOriginalElement(element);
-    const cachedDomElement = originalElement._domElement;
-    updateDomElement(element, cachedDomElement.parentNode, cachedDomElement);
+export function renderRootDomElement(parentDomElement, element) {
+    const purePrimitiveElementRoot = renderElementRecursive(element);
+    parentDomElement.insertBefore(
+        createDomElementRecursive(purePrimitiveElementRoot),
+        parentDomElement.firstChild
+    )
 }
 
-export function getOriginalElement(element) {
-    let r;
-    for (r = element; !_.isNull(r.renderedBy); r = r.renderedBy) {
+// an element has change, we need to re-render, and apply the DOM
+// with the new rendered result
+export function renderElementAndUpdateDom(element) {
+    const debugRenderElement = debug_options['render-element'];
+
+    if (debugRenderElement) {
+        console.log(`[renderElementAndUpdateDom]: enter, element=${element}`)
     }
-    return r;
+
+    let currentElement = null;
+
+    // v DOM before the update
+    currentElement = element;
+    while (!currentElement.isPrimitive) {
+        currentElement = currentElement.renderedTo;
+    }
+    const prevPurePrimitiveElement = currentElement;
+    const domElement = prevPurePrimitiveElement._domElement;
+
+    // now perform the update
+    const nextPurePrimitiveElement = renderElementRecursive(element);
+    applyDiff(prevPurePrimitiveElement, nextPurePrimitiveElement, null, domElement);
+
+    if (debugRenderElement) {
+        console.log(`[renderElementAndUpdateDom]: exit`)
+    }
 }
 
