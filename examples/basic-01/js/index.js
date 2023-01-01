@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import {Component, componentFactory, renderRootDomElement} from "coyote2";
+import {DIV, P, BUTTON} from "coyote2";
 
 const COLORS = ['green', 'red'];
 const MyPage = componentFactory(class MyPage extends Component {
@@ -14,14 +15,14 @@ const MyPage = componentFactory(class MyPage extends Component {
     }
 
     render() {
-        return div(
-            p(
+        return DIV(
+            P(
                 {
                     style: `color:${COLORS[this.state.count % 2]};`,
                 }, 
                 `Clicked ${this.state.count} times`
             ),
-            button({onclick: this.btnClickHandler}, ">> click me <<")
+            BUTTON({onclick: this.btnClickHandler}, ">> click me <<")
         );
     }
 });

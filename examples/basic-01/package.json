@@ -19,7 +19,7 @@
   "author": "Stone Zhong",
   "license": "MIT",
   "dependencies": {
-    "coyote2": "^0.0.9",
+    "coyote2": "^0.0.10",
     "jquery": "^3.6.3"
   }
 }

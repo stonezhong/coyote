@@ -202,134 +202,118 @@ export const componentFactory = type => (...children) => {
     return new type({}, children);
 };
 
-// https://www.tutorialrepublic.com/html-reference/html5-tags.php
-[
-    "a",
-    "abbr",
-    // "acronym",
-    "address",
-    // "applet",
-    "area",
-    "article",
-    "aside",
-    "audio",
-    "b",
-    "base",
-    // "basefont",
-    "bdi",
-    "bdo",
-    // "big",
-    "blockquote",
-    "body",
-    "br",
-    "button",
-    "canvas",
-    "caption",
-    // "center",
-    "cite",
-    "code",
-    "col",
-    "colgroup",
-    "data",
-    "datalist",
-    "dd",
-    "del",
-    "details",
-    "dfn",
-    "dialog",
-    // "dir",
-    "div",
-    "dl",
-    "dt",
-    "em",
-    "embed",
-    "fieldset",
-    "figcaption",
-    "figure",
-    // "font",
-    "footer",
-    "form",
-    // "frame",
-    // "frameset",
-    "head",
-    "header",
-    "hgroup",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "hr",
-    "html",
-    "i",
-    "iframe",
-    "img",
-    "input",
-    "ins",
-    "kbd",
-    "keygen",
-    "label",
-    "legend",
-    "li",
-    "link",
-    "main",
-    "map",
-    "mark",
-    "menu",
-    "menuitem",
-    "meta",
-    "meter",
-    "nav",
-    // "noframes",
-    "noscript",
-    "object",
-    "ol",
-    "optgroup",
-    "option",
-    "output",
-    "p",
-    "param",
-    "picture",
-    "pre",
-    "progress",
-    "q",
-    "rp",
-    "rt",
-    "ruby",
-    "s",
-    "samp",
-    "script",
-    "section",
-    "select",
-    "small",
-    "source",
-    "span",
-    // "strike",
-    "strong",
-    "style",
-    "sub",
-    "summary",
-    "sup",
-    "svg",
-    "table",
-    "tbody",
-    "td",
-    "template",
-    "textarea",
-    "tfoot",
-    "th",
-    "thead",
-    "time",
-    "title",
-    "tr",
-    "track",
-    // "tt",
-    "u",
-    "ul",
-    "var",
-    "video",
-    "wbr"
-].forEach(tagName => {
-    window[tagName] = componentFactory(_primitiveComponent(tagName));
-});
+// generated code
+export const A = componentFactory(_primitiveComponent('a'));
+export const ABBR = componentFactory(_primitiveComponent('abbr'));
+export const ADDRESS = componentFactory(_primitiveComponent('address'));
+export const AREA = componentFactory(_primitiveComponent('area'));
+export const ARTICLE = componentFactory(_primitiveComponent('article'));
+export const ASIDE = componentFactory(_primitiveComponent('aside'));
+export const AUDIO = componentFactory(_primitiveComponent('audio'));
+export const B = componentFactory(_primitiveComponent('b'));
+export const BASE = componentFactory(_primitiveComponent('base'));
+export const BDI = componentFactory(_primitiveComponent('bdi'));
+export const BDO = componentFactory(_primitiveComponent('bdo'));
+export const BLOCKQUOTE = componentFactory(_primitiveComponent('blockquote'));
+export const BODY = componentFactory(_primitiveComponent('body'));
+export const BR = componentFactory(_primitiveComponent('br'));
+export const BUTTON = componentFactory(_primitiveComponent('button'));
+export const CANVAS = componentFactory(_primitiveComponent('canvas'));
+export const CAPTION = componentFactory(_primitiveComponent('caption'));
+export const CITE = componentFactory(_primitiveComponent('cite'));
+export const CODE = componentFactory(_primitiveComponent('code'));
+export const COL = componentFactory(_primitiveComponent('col'));
+export const COLGROUP = componentFactory(_primitiveComponent('colgroup'));
+export const DATA = componentFactory(_primitiveComponent('data'));
+export const DATALIST = componentFactory(_primitiveComponent('datalist'));
+export const DD = componentFactory(_primitiveComponent('dd'));
+export const DEL = componentFactory(_primitiveComponent('del'));
+export const DETAILS = componentFactory(_primitiveComponent('details'));
+export const DFN = componentFactory(_primitiveComponent('dfn'));
+export const DIALOG = componentFactory(_primitiveComponent('dialog'));
+export const DIV = componentFactory(_primitiveComponent('div'));
+export const DL = componentFactory(_primitiveComponent('dl'));
+export const DT = componentFactory(_primitiveComponent('dt'));
+export const EM = componentFactory(_primitiveComponent('em'));
+export const EMBED = componentFactory(_primitiveComponent('embed'));
+export const FIELDSET = componentFactory(_primitiveComponent('fieldset'));
+export const FIGCAPTION = componentFactory(_primitiveComponent('figcaption'));
+export const FIGURE = componentFactory(_primitiveComponent('figure'));
+export const FOOTER = componentFactory(_primitiveComponent('footer'));
+export const FORM = componentFactory(_primitiveComponent('form'));
+export const HEAD = componentFactory(_primitiveComponent('head'));
+export const HEADER = componentFactory(_primitiveComponent('header'));
+export const HGROUP = componentFactory(_primitiveComponent('hgroup'));
+export const H1 = componentFactory(_primitiveComponent('h1'));
+export const H2 = componentFactory(_primitiveComponent('h2'));
+export const H3 = componentFactory(_primitiveComponent('h3'));
+export const H4 = componentFactory(_primitiveComponent('h4'));
+export const H5 = componentFactory(_primitiveComponent('h5'));
+export const H6 = componentFactory(_primitiveComponent('h6'));
+export const HR = componentFactory(_primitiveComponent('hr'));
+export const HTML = componentFactory(_primitiveComponent('html'));
+export const I = componentFactory(_primitiveComponent('i'));
+export const IFRAME = componentFactory(_primitiveComponent('iframe'));
+export const IMG = componentFactory(_primitiveComponent('img'));
+export const INPUT = componentFactory(_primitiveComponent('input'));
+export const INS = componentFactory(_primitiveComponent('ins'));
+export const KBD = componentFactory(_primitiveComponent('kbd'));
+export const KEYGEN = componentFactory(_primitiveComponent('keygen'));
+export const LABEL = componentFactory(_primitiveComponent('label'));
+export const LEGEND = componentFactory(_primitiveComponent('legend'));
+export const LI = componentFactory(_primitiveComponent('li'));
+export const LINK = componentFactory(_primitiveComponent('link'));
+export const MAIN = componentFactory(_primitiveComponent('main'));
+export const MAP = componentFactory(_primitiveComponent('map'));
+export const MARK = componentFactory(_primitiveComponent('mark'));
+export const MENU = componentFactory(_primitiveComponent('menu'));
+export const MENUITEM = componentFactory(_primitiveComponent('menuitem'));
+export const META = componentFactory(_primitiveComponent('meta'));
+export const METER = componentFactory(_primitiveComponent('meter'));
+export const NAV = componentFactory(_primitiveComponent('nav'));
+export const NOSCRIPT = componentFactory(_primitiveComponent('noscript'));
+export const OBJECT = componentFactory(_primitiveComponent('object'));
+export const OL = componentFactory(_primitiveComponent('ol'));
+export const OPTGROUP = componentFactory(_primitiveComponent('optgroup'));
+export const OPTION = componentFactory(_primitiveComponent('option'));
+export const OUTPUT = componentFactory(_primitiveComponent('output'));
+export const P = componentFactory(_primitiveComponent('p'));
+export const PARAM = componentFactory(_primitiveComponent('param'));
+export const PICTURE = componentFactory(_primitiveComponent('picture'));
+export const PRE = componentFactory(_primitiveComponent('pre'));
+export const PROGRESS = componentFactory(_primitiveComponent('progress'));
+export const Q = componentFactory(_primitiveComponent('q'));
+export const RP = componentFactory(_primitiveComponent('rp'));
+export const RT = componentFactory(_primitiveComponent('rt'));
+export const RUBY = componentFactory(_primitiveComponent('ruby'));
+export const S = componentFactory(_primitiveComponent('s'));
+export const SAMP = componentFactory(_primitiveComponent('samp'));
+export const SCRIPT = componentFactory(_primitiveComponent('script'));
+export const SECTION = componentFactory(_primitiveComponent('section'));
+export const SELECT = componentFactory(_primitiveComponent('select'));
+export const SMALL = componentFactory(_primitiveComponent('small'));
+export const SOURCE = componentFactory(_primitiveComponent('source'));
+export const SPAN = componentFactory(_primitiveComponent('span'));
+export const STRONG = componentFactory(_primitiveComponent('strong'));
+export const STYLE = componentFactory(_primitiveComponent('style'));
+export const SUB = componentFactory(_primitiveComponent('sub'));
+export const SUMMARY = componentFactory(_primitiveComponent('summary'));
+export const SUP = componentFactory(_primitiveComponent('sup'));
+export const SVG = componentFactory(_primitiveComponent('svg'));
+export const TABLE = componentFactory(_primitiveComponent('table'));
+export const TBODY = componentFactory(_primitiveComponent('tbody'));
+export const TD = componentFactory(_primitiveComponent('td'));
+export const TEMPLATE = componentFactory(_primitiveComponent('template'));
+export const TEXTAREA = componentFactory(_primitiveComponent('textarea'));
+export const TFOOT = componentFactory(_primitiveComponent('tfoot'));
+export const TH = componentFactory(_primitiveComponent('th'));
+export const THEAD = componentFactory(_primitiveComponent('thead'));
+export const TIME = componentFactory(_primitiveComponent('time'));
+export const TITLE = componentFactory(_primitiveComponent('title'));
+export const TR = componentFactory(_primitiveComponent('tr'));
+export const TRACK = componentFactory(_primitiveComponent('track'));
+export const U = componentFactory(_primitiveComponent('u'));
+export const UL = componentFactory(_primitiveComponent('ul'));
+export const VAR = componentFactory(_primitiveComponent('var'));
+export const VIDEO = componentFactory(_primitiveComponent('video'));
+export const WBR = componentFactory(_primitiveComponent('wbr'));
