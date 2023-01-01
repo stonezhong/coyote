@@ -1,7 +1,11 @@
 {
   "name": "coyote2",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A Lightweight Web UI Framework",
+  "type": "module",
+  "exports": {
+    "./components1": "./dist/components.js"
+  },
   "main": "dist/index.js",
   "author": "Stone Zhong",
   "license": "ISC",

@@ -3,7 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.componentFactory = exports.Component = void 0;
+exports.TBODY = exports.TABLE = exports.SVG = exports.SUP = exports.SUMMARY = exports.SUB = exports.STYLE = exports.STRONG = exports.SPAN = exports.SOURCE = exports.SMALL = exports.SELECT = exports.SECTION = exports.SCRIPT = exports.SAMP = exports.S = exports.RUBY = exports.RT = exports.RP = exports.Q = exports.PROGRESS = exports.PRE = exports.PICTURE = exports.PARAM = exports.P = exports.OUTPUT = exports.OPTION = exports.OPTGROUP = exports.OL = exports.OBJECT = exports.NOSCRIPT = exports.NAV = exports.METER = exports.META = exports.MENUITEM = exports.MENU = exports.MARK = exports.MAP = exports.MAIN = exports.LINK = exports.LI = exports.LEGEND = exports.LABEL = exports.KEYGEN = exports.KBD = exports.INS = exports.INPUT = exports.IMG = exports.IFRAME = exports.I = exports.HTML = exports.HR = exports.HGROUP = exports.HEADER = exports.HEAD = exports.H6 = exports.H5 = exports.H4 = exports.H3 = exports.H2 = exports.H1 = exports.FORM = exports.FOOTER = exports.FIGURE = exports.FIGCAPTION = exports.FIELDSET = exports.EMBED = exports.EM = exports.DT = exports.DL = exports.DIV = exports.DIALOG = exports.DFN = exports.DETAILS = exports.DEL = exports.DD = exports.DATALIST = exports.DATA = exports.Component = exports.COLGROUP = exports.COL = exports.CODE = exports.CITE = exports.CAPTION = exports.CANVAS = exports.BUTTON = exports.BR = exports.BODY = exports.BLOCKQUOTE = exports.BDO = exports.BDI = exports.BASE = exports.B = exports.AUDIO = exports.ASIDE = exports.ARTICLE = exports.AREA = exports.ADDRESS = exports.ABBR = exports.A = void 0;
+exports.componentFactory = exports.WBR = exports.VIDEO = exports.VAR = exports.UL = exports.U = exports.TRACK = exports.TR = exports.TITLE = exports.TIME = exports.THEAD = exports.TH = exports.TFOOT = exports.TEXTAREA = exports.TEMPLATE = exports.TD = void 0;
 var _lodash = _interopRequireDefault(require("lodash"));
 var _immer = _interopRequireDefault(require("immer"));
 var _utils = require("./utils");
@@ -278,31 +279,233 @@ var componentFactory = function componentFactory(type) {
   };
 };
 
-// https://www.tutorialrepublic.com/html-reference/html5-tags.php
+// generated code
 exports.componentFactory = componentFactory;
-["a", "abbr",
-// "acronym",
-"address",
-// "applet",
-"area", "article", "aside", "audio", "b", "base",
-// "basefont",
-"bdi", "bdo",
-// "big",
-"blockquote", "body", "br", "button", "canvas", "caption",
-// "center",
-"cite", "code", "col", "colgroup", "data", "datalist", "dd", "del", "details", "dfn", "dialog",
-// "dir",
-"div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure",
-// "font",
-"footer", "form",
-// "frame",
-// "frameset",
-"head", "header", "hgroup", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "html", "i", "iframe", "img", "input", "ins", "kbd", "keygen", "label", "legend", "li", "link", "main", "map", "mark", "menu", "menuitem", "meta", "meter", "nav",
-// "noframes",
-"noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "picture", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "span",
-// "strike",
-"strong", "style", "sub", "summary", "sup", "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track",
-// "tt",
-"u", "ul", "var", "video", "wbr"].forEach(function (tagName) {
-  window[tagName] = componentFactory(_primitiveComponent(tagName));
-});
+var A = componentFactory(_primitiveComponent('a'));
+exports.A = A;
+var ABBR = componentFactory(_primitiveComponent('abbr'));
+exports.ABBR = ABBR;
+var ADDRESS = componentFactory(_primitiveComponent('address'));
+exports.ADDRESS = ADDRESS;
+var AREA = componentFactory(_primitiveComponent('area'));
+exports.AREA = AREA;
+var ARTICLE = componentFactory(_primitiveComponent('article'));
+exports.ARTICLE = ARTICLE;
+var ASIDE = componentFactory(_primitiveComponent('aside'));
+exports.ASIDE = ASIDE;
+var AUDIO = componentFactory(_primitiveComponent('audio'));
+exports.AUDIO = AUDIO;
+var B = componentFactory(_primitiveComponent('b'));
+exports.B = B;
+var BASE = componentFactory(_primitiveComponent('base'));
+exports.BASE = BASE;
+var BDI = componentFactory(_primitiveComponent('bdi'));
+exports.BDI = BDI;
+var BDO = componentFactory(_primitiveComponent('bdo'));
+exports.BDO = BDO;
+var BLOCKQUOTE = componentFactory(_primitiveComponent('blockquote'));
+exports.BLOCKQUOTE = BLOCKQUOTE;
+var BODY = componentFactory(_primitiveComponent('body'));
+exports.BODY = BODY;
+var BR = componentFactory(_primitiveComponent('br'));
+exports.BR = BR;
+var BUTTON = componentFactory(_primitiveComponent('button'));
+exports.BUTTON = BUTTON;
+var CANVAS = componentFactory(_primitiveComponent('canvas'));
+exports.CANVAS = CANVAS;
+var CAPTION = componentFactory(_primitiveComponent('caption'));
+exports.CAPTION = CAPTION;
+var CITE = componentFactory(_primitiveComponent('cite'));
+exports.CITE = CITE;
+var CODE = componentFactory(_primitiveComponent('code'));
+exports.CODE = CODE;
+var COL = componentFactory(_primitiveComponent('col'));
+exports.COL = COL;
+var COLGROUP = componentFactory(_primitiveComponent('colgroup'));
+exports.COLGROUP = COLGROUP;
+var DATA = componentFactory(_primitiveComponent('data'));
+exports.DATA = DATA;
+var DATALIST = componentFactory(_primitiveComponent('datalist'));
+exports.DATALIST = DATALIST;
+var DD = componentFactory(_primitiveComponent('dd'));
+exports.DD = DD;
+var DEL = componentFactory(_primitiveComponent('del'));
+exports.DEL = DEL;
+var DETAILS = componentFactory(_primitiveComponent('details'));
+exports.DETAILS = DETAILS;
+var DFN = componentFactory(_primitiveComponent('dfn'));
+exports.DFN = DFN;
+var DIALOG = componentFactory(_primitiveComponent('dialog'));
+exports.DIALOG = DIALOG;
+var DIV = componentFactory(_primitiveComponent('div'));
+exports.DIV = DIV;
+var DL = componentFactory(_primitiveComponent('dl'));
+exports.DL = DL;
+var DT = componentFactory(_primitiveComponent('dt'));
+exports.DT = DT;
+var EM = componentFactory(_primitiveComponent('em'));
+exports.EM = EM;
+var EMBED = componentFactory(_primitiveComponent('embed'));
+exports.EMBED = EMBED;
+var FIELDSET = componentFactory(_primitiveComponent('fieldset'));
+exports.FIELDSET = FIELDSET;
+var FIGCAPTION = componentFactory(_primitiveComponent('figcaption'));
+exports.FIGCAPTION = FIGCAPTION;
+var FIGURE = componentFactory(_primitiveComponent('figure'));
+exports.FIGURE = FIGURE;
+var FOOTER = componentFactory(_primitiveComponent('footer'));
+exports.FOOTER = FOOTER;
+var FORM = componentFactory(_primitiveComponent('form'));
+exports.FORM = FORM;
+var HEAD = componentFactory(_primitiveComponent('head'));
+exports.HEAD = HEAD;
+var HEADER = componentFactory(_primitiveComponent('header'));
+exports.HEADER = HEADER;
+var HGROUP = componentFactory(_primitiveComponent('hgroup'));
+exports.HGROUP = HGROUP;
+var H1 = componentFactory(_primitiveComponent('h1'));
+exports.H1 = H1;
+var H2 = componentFactory(_primitiveComponent('h2'));
+exports.H2 = H2;
+var H3 = componentFactory(_primitiveComponent('h3'));
+exports.H3 = H3;
+var H4 = componentFactory(_primitiveComponent('h4'));
+exports.H4 = H4;
+var H5 = componentFactory(_primitiveComponent('h5'));
+exports.H5 = H5;
+var H6 = componentFactory(_primitiveComponent('h6'));
+exports.H6 = H6;
+var HR = componentFactory(_primitiveComponent('hr'));
+exports.HR = HR;
+var HTML = componentFactory(_primitiveComponent('html'));
+exports.HTML = HTML;
+var I = componentFactory(_primitiveComponent('i'));
+exports.I = I;
+var IFRAME = componentFactory(_primitiveComponent('iframe'));
+exports.IFRAME = IFRAME;
+var IMG = componentFactory(_primitiveComponent('img'));
+exports.IMG = IMG;
+var INPUT = componentFactory(_primitiveComponent('input'));
+exports.INPUT = INPUT;
+var INS = componentFactory(_primitiveComponent('ins'));
+exports.INS = INS;
+var KBD = componentFactory(_primitiveComponent('kbd'));
+exports.KBD = KBD;
+var KEYGEN = componentFactory(_primitiveComponent('keygen'));
+exports.KEYGEN = KEYGEN;
+var LABEL = componentFactory(_primitiveComponent('label'));
+exports.LABEL = LABEL;
+var LEGEND = componentFactory(_primitiveComponent('legend'));
+exports.LEGEND = LEGEND;
+var LI = componentFactory(_primitiveComponent('li'));
+exports.LI = LI;
+var LINK = componentFactory(_primitiveComponent('link'));
+exports.LINK = LINK;
+var MAIN = componentFactory(_primitiveComponent('main'));
+exports.MAIN = MAIN;
+var MAP = componentFactory(_primitiveComponent('map'));
+exports.MAP = MAP;
+var MARK = componentFactory(_primitiveComponent('mark'));
+exports.MARK = MARK;
+var MENU = componentFactory(_primitiveComponent('menu'));
+exports.MENU = MENU;
+var MENUITEM = componentFactory(_primitiveComponent('menuitem'));
+exports.MENUITEM = MENUITEM;
+var META = componentFactory(_primitiveComponent('meta'));
+exports.META = META;
+var METER = componentFactory(_primitiveComponent('meter'));
+exports.METER = METER;
+var NAV = componentFactory(_primitiveComponent('nav'));
+exports.NAV = NAV;
+var NOSCRIPT = componentFactory(_primitiveComponent('noscript'));
+exports.NOSCRIPT = NOSCRIPT;
+var OBJECT = componentFactory(_primitiveComponent('object'));
+exports.OBJECT = OBJECT;
+var OL = componentFactory(_primitiveComponent('ol'));
+exports.OL = OL;
+var OPTGROUP = componentFactory(_primitiveComponent('optgroup'));
+exports.OPTGROUP = OPTGROUP;
+var OPTION = componentFactory(_primitiveComponent('option'));
+exports.OPTION = OPTION;
+var OUTPUT = componentFactory(_primitiveComponent('output'));
+exports.OUTPUT = OUTPUT;
+var P = componentFactory(_primitiveComponent('p'));
+exports.P = P;
+var PARAM = componentFactory(_primitiveComponent('param'));
+exports.PARAM = PARAM;
+var PICTURE = componentFactory(_primitiveComponent('picture'));
+exports.PICTURE = PICTURE;
+var PRE = componentFactory(_primitiveComponent('pre'));
+exports.PRE = PRE;
+var PROGRESS = componentFactory(_primitiveComponent('progress'));
+exports.PROGRESS = PROGRESS;
+var Q = componentFactory(_primitiveComponent('q'));
+exports.Q = Q;
+var RP = componentFactory(_primitiveComponent('rp'));
+exports.RP = RP;
+var RT = componentFactory(_primitiveComponent('rt'));
+exports.RT = RT;
+var RUBY = componentFactory(_primitiveComponent('ruby'));
+exports.RUBY = RUBY;
+var S = componentFactory(_primitiveComponent('s'));
+exports.S = S;
+var SAMP = componentFactory(_primitiveComponent('samp'));
+exports.SAMP = SAMP;
+var SCRIPT = componentFactory(_primitiveComponent('script'));
+exports.SCRIPT = SCRIPT;
+var SECTION = componentFactory(_primitiveComponent('section'));
+exports.SECTION = SECTION;
+var SELECT = componentFactory(_primitiveComponent('select'));
+exports.SELECT = SELECT;
+var SMALL = componentFactory(_primitiveComponent('small'));
+exports.SMALL = SMALL;
+var SOURCE = componentFactory(_primitiveComponent('source'));
+exports.SOURCE = SOURCE;
+var SPAN = componentFactory(_primitiveComponent('span'));
+exports.SPAN = SPAN;
+var STRONG = componentFactory(_primitiveComponent('strong'));
+exports.STRONG = STRONG;
+var STYLE = componentFactory(_primitiveComponent('style'));
+exports.STYLE = STYLE;
+var SUB = componentFactory(_primitiveComponent('sub'));
+exports.SUB = SUB;
+var SUMMARY = componentFactory(_primitiveComponent('summary'));
+exports.SUMMARY = SUMMARY;
+var SUP = componentFactory(_primitiveComponent('sup'));
+exports.SUP = SUP;
+var SVG = componentFactory(_primitiveComponent('svg'));
+exports.SVG = SVG;
+var TABLE = componentFactory(_primitiveComponent('table'));
+exports.TABLE = TABLE;
+var TBODY = componentFactory(_primitiveComponent('tbody'));
+exports.TBODY = TBODY;
+var TD = componentFactory(_primitiveComponent('td'));
+exports.TD = TD;
+var TEMPLATE = componentFactory(_primitiveComponent('template'));
+exports.TEMPLATE = TEMPLATE;
+var TEXTAREA = componentFactory(_primitiveComponent('textarea'));
+exports.TEXTAREA = TEXTAREA;
+var TFOOT = componentFactory(_primitiveComponent('tfoot'));
+exports.TFOOT = TFOOT;
+var TH = componentFactory(_primitiveComponent('th'));
+exports.TH = TH;
+var THEAD = componentFactory(_primitiveComponent('thead'));
+exports.THEAD = THEAD;
+var TIME = componentFactory(_primitiveComponent('time'));
+exports.TIME = TIME;
+var TITLE = componentFactory(_primitiveComponent('title'));
+exports.TITLE = TITLE;
+var TR = componentFactory(_primitiveComponent('tr'));
+exports.TR = TR;
+var TRACK = componentFactory(_primitiveComponent('track'));
+exports.TRACK = TRACK;
+var U = componentFactory(_primitiveComponent('u'));
+exports.U = U;
+var UL = componentFactory(_primitiveComponent('ul'));
+exports.UL = UL;
+var VAR = componentFactory(_primitiveComponent('var'));
+exports.VAR = VAR;
+var VIDEO = componentFactory(_primitiveComponent('video'));
+exports.VIDEO = VIDEO;
+var WBR = componentFactory(_primitiveComponent('wbr'));
+exports.WBR = WBR;
