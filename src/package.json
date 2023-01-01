@@ -1,0 +1,12 @@
+{
+  "name": "coyote",
+  "version": "0.0.1",
+  "description": "A Lightweight Web UI Framework",
+  "main": "index.js",
+  "author": "Stone Zhong",
+  "license": "ISC",
+  "dependencies": {
+    "immer": "^9.0.16",
+    "lodash": "^4.17.21"
+  }
+}
