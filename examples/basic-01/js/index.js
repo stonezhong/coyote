@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import {Component, componentFactory, renderRootDomElement} from "coyote2";
 
+const COLORS = ['green', 'red'];
 const MyPage = componentFactory(class MyPage extends Component {
     state = {
         count: 0,
@@ -13,26 +14,15 @@ const MyPage = componentFactory(class MyPage extends Component {
     }
 
     render() {
-        if (this.state.count %2 ==0 ) {
-            return div(
-                p(
-                    {
-                        style: 'color:red;',
-                    }, 
-                    `Clicked ${this.state.count} times`
-                ),
-                p("even!"),
-                button({onclick: this.btnClickHandler}, ">> click me <<")
-            );
-        } else {
-            return div(
-                p(
-                    `Clicked ${this.state.count} times`
-                ),
-                button({onclick: this.btnClickHandler}, ">> click me <<")
-            );
-
-        }
+        return div(
+            p(
+                {
+                    style: `color:${COLORS[this.state.count % 2]};`,
+                }, 
+                `Clicked ${this.state.count} times`
+            ),
+            button({onclick: this.btnClickHandler}, ">> click me <<")
+        );
     }
 });
 
