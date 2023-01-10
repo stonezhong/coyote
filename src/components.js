@@ -23,85 +23,102 @@ const eventHandlerProps = new Set(['onclick']);
  */
 
 export class Component {
-    state = {}
-    parent = null;                  // points to the parent element
+    __cyoLastRender = {}             // the return from the latest render() method
+    __cyoIsPrimitive = false;        // true for primitive element
+    __cyoRenderedBy = null;          // other element that produce this element via render()
+    __cyoRenderedTo = null;          // the element this element renders to via render()
 
-    isPrimitive = false;             // true for primitive element
-    renderedBy = null;               // other element that produce this element via render()
-    renderedTo = null;               // the element this element renders to via render()
+    state = {}
 
     constructor(props, children) {
-        this.props = props;          // always a raw object, e.g. {x: 1, y: 2}
-        this.children = children;    // an array
+        this.props = {...props, children};
     }
 
+    // for debugging purpose only
     toString() {
         return `${this.constructor.name}`;
-    }
-
-    getState() {
-        return this.state;
     }
 
     setState(changer) {
         this.state = produce(this.state, changer);
         renderElementAndUpdateDom(this);
     }
+
+    __cyoWrapRender() {
+        const output = this.render();
+        if (_.isString(output))  {
+            return new TextComponent(output);
+        }
+        if (!output) {
+            return new NullComponent();
+        }
+        if (output instanceof Component) {
+            return output;
+        }
+        throw new Error("Invalid render result!");
+    }
 }
 
 class NullComponent extends Component {
     // this is usually act as placeholder for null or false for 
-    _domElement = null;
+    __cyoDomElement = null;
 
     constructor(text) {
         super({}, []);
-        this.isPrimitive = true;
+        this.__cyoIsPrimitive = true;
     }
 
     toString() {
         return `Null`;
     }
 
-    _createDomElement() {
+    __cyoCreateDomElement() {
         DEBUG_CREATE_NULL_NODE();
         return document.createComment("for null component");
     }
-    _updateDomElement(cachedElement, domElement) {
+    
+    __cyoUpdateDomElement(cachedElement, domElement) {
     }
-    getTagName() {
+
+    __cyoGetTagName() {
         return "#comment";
     }
 };
 
 class TextComponent extends Component {
-    _domElement = null;
+    __cyoDomElement = null;
+    __cyoText = null;
 
     constructor(text) {
         super({}, []);
-        this._text = text;
-        this.isPrimitive = true;
+        this.__cyoText = text;
+        this.__cyoIsPrimitive = true;
     }
     toString() {
-        return `Text(${this._text})`;
+        return `Text(${this.__cyoText})>`;
     }
-    _createDomElement() {
-        DEBUG_CREATE_TEXT_NODE(this._text);
-        return document.createTextNode(this._text);
+    
+    __cyoCreateDomElement() {
+        DEBUG_CREATE_TEXT_NODE(this.__cyoText);
+        return document.createTextNode(this.__cyoText);
     }
-    _updateDomElement(cachedElement, domElement) {
-        if (this._text !== cachedElement._text) {
-            DEBUG_UPDATE_TEXT_NODE(this._text);
-            domElement.nodeValue = this._text;
+
+    __cyoUpdateDomElement(cachedElement, domElement) {
+        if (this.__cyoText !== cachedElement.__cyoText) {
+            DEBUG_UPDATE_TEXT_NODE(this.__cyoText);
+            domElement.nodeValue = this.__cyoText;
         }
     }
-    getTagName() {
+    
+    __cyoGetTagName() {
         return "#text";
     }
 };
 
+
 function _primitiveComponent(tag) {
     class PrimitiveComponent extends Component {
-        _domElement = null;
+        __cyoDomElement = null;
 
         constructor(props, children) {
             super(props, children.map(
@@ -120,21 +137,18 @@ function _primitiveComponent(tag) {
                     throw new Error(`Invalid child: ${child}`);
                 }
             ));
-            for (const child of this.children) {
-                child.parent = this;
-            }
-            this.isPrimitive = true;
+            this.__cyoIsPrimitive = true;
         }
 
         toString() {
             return tag;
         }
     
-        getTagName() {
+        __cyoGetTagName() {
             return tag;
         }
 
-        _set_dom_attr(domElement, attrName, attrValue) {
+        __cyoSetDomAttr(domElement, attrName, attrValue) {
             DEBUG_DOM_ATTR_SET(domElement, attrName, attrValue);
             if (eventHandlerProps.has(attrName)) {
                 domElement[attrName] = attrValue;
@@ -143,7 +157,7 @@ function _primitiveComponent(tag) {
             }
         }
 
-        _remove_dom_attr(domElement, attrName) {
+        __cyoRemoveDomAttr(domElement, attrName) {
             DEBUG_DOM_ATTR_REMOVE(domElement, attrName);
             if (eventHandlerProps.has(attrName)) {
                 domElement[attrName] = null;
@@ -152,22 +166,22 @@ function _primitiveComponent(tag) {
             }
         }
 
-        _createDomElement() {
+        __cyoCreateDomElement() {
             DEBUG_DOM_CREATE(tag);
             const domElement = document.createElement(tag);
             for (const key in this.props) {
-                this._set_dom_attr(domElement, key, this.props[key]);
+                this.__cyoSetDomAttr(domElement, key, this.props[key]);
             }
             return domElement;
         }
 
-        _updateDomElement(cachedElement, domElement) {
+        __cyoUpdateDomElement(cachedElement, domElement) {
             const prevPropKeys = new Set(Object.keys(cachedElement.props));
             const propKeys = new Set(Object.keys(this.props));
 
             for (let key of Object.keys(cachedElement.props)) {
                 if (!propKeys.has(key)) {
-                    this._remove_dom_attr(domElement, key);
+                    this.__cyoRemoveDomAttr(domElement, key);
                 }
             }
 
@@ -175,10 +189,10 @@ function _primitiveComponent(tag) {
                 const value = this.props[key];
                 if (prevPropKeys.has(key)) {
                     if (cachedElement.props[key] !== value) {
-                        this._set_dom_attr(domElement, key, value);
+                        this.__cyoSetDomAttr(domElement, key, value);
                     }
                 } else {
-                    this._set_dom_attr(domElement, key, value);
+                    this.__cyoSetDomAttr(domElement, key, value);
                 }
             }
         }

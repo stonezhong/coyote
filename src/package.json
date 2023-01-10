@@ -1,6 +1,6 @@
 {
   "name": "coyote2",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "A Lightweight Web UI Framework",
   "type": "module",
   "exports": {

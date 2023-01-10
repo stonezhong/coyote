@@ -2,43 +2,53 @@ import _ from "lodash";
 
 import {debug_options, DEBUG_DOM_REMOVE, DEBUG_DOM_REPLACE} from "./debug";
 
+// function collectKeyedChildren(element, keyedChildren) {
+//     element.props.children.forEach((childElement) => {
+//         const key = childElement.props.key;
+//         if (!_.isUndefined(key)) {
+//             keyedChildren[key] = childElement;
+//         }
+//         collectKeyedChildren(childElement, keyedChildren);
+//         return;
+//     });
+// }
 
-// pure primite element tree are considered DOM equivalent
-// return the before and after pure primite element tree so we know the diff
-function renderElement(element) {
-    let currentElement = element;
-    
-    // get the pureElement before the change
-    while (!currentElement.isPrimitive) {
-        currentElement = currentElement.renderedTo;
-    }
-    let prevVDomRoot = currentElement;
-    let nextVDOMRoot = renderElementRecursive(element);
+// // when we render a component, the output MUST be merged with previous rendered
+// // output so we can preserve element STATUS
+// function renderWithMerge(element) {
+//     const keyedChildren = {};
+//     const render = this.render();
+//     if 
+//     collectKeyedChildren(render, keyedChildren);
 
-    return [prevVDomRoot, nextVDOMRoot];
-}
+//     const lastRender = element._lastRender;
+//     const render = element.render();
+
+//     mergeFromLastRender(render, element._lastRender, keyedChildren);
+//     element._lastRender = render;
+//     return render;
+// }
 
 
 // we will get a new root points to the pure primitive element tree
 function renderElementRecursive(element) {
     let currentElement = element;
    
-    while (!currentElement.isPrimitive) {
-        const nextElement = currentElement.render();
-        nextElement.parent = currentElement.parent;
-        nextElement.renderedBy = currentElement;
-        currentElement.renderedTo = nextElement;
+    while (!currentElement.__cyoIsPrimitive) {
+        const nextElement = currentElement.__cyoWrapRender();
+        nextElement.__cyoRenderedBy = currentElement;
+        currentElement.__cyoRenderedTo = nextElement;
         currentElement = nextElement;
     }
 
-    currentElement.children = currentElement.children.map(renderElementRecursive);
+    currentElement.props.children = currentElement.props.children.map(renderElementRecursive);
 
     return currentElement;
 }
 
 function createDomElementRecursive(purePrimitiveElement) {
-    const domElement = purePrimitiveElement._createDomElement();
-    purePrimitiveElement._domElement = domElement;
+    const domElement = purePrimitiveElement.__cyoCreateDomElement();
+    purePrimitiveElement.__cyoDomElement = domElement;
     for (const childElement of purePrimitiveElement.children) {
         domElement.appendChild(createDomElementRecursive(childElement));
     }
@@ -62,34 +72,34 @@ function applyDiff(prevPurePrimitiveElement, nextPurePrimitiveElement, parentDom
         return;
     }
 
-    if (prevPurePrimitiveElement.getTagName() === nextPurePrimitiveElement.getTagName()) {
+    if (prevPurePrimitiveElement.__cyoGetTagName() === nextPurePrimitiveElement.__cyoGetTagName()) {
         if (debugApplyDiff) {
-            console.log(`${debugPrefix}[applyDiff]: reuse, tag is ${prevPurePrimitiveElement.getTagName()}`);
+            console.log(`${debugPrefix}[applyDiff]: reuse, tag is ${prevPurePrimitiveElement.__cyoGetTagName()}`);
         }
         // we will reuse the DOM
-        nextPurePrimitiveElement._updateDomElement(prevPurePrimitiveElement, domElement);
-        nextPurePrimitiveElement._domElement = domElement;
+        nextPurePrimitiveElement.__cyoUpdateDomElement(prevPurePrimitiveElement, domElement);
+        nextPurePrimitiveElement.__cyoDomElement = domElement;
 
-        const commonChildrenLen = Math.min(prevPurePrimitiveElement.children.length, nextPurePrimitiveElement.children.length);
+        const commonChildrenLen = Math.min(prevPurePrimitiveElement.props.children.length, nextPurePrimitiveElement.props.children.length);
         if (debugApplyDiff) {
             console.log(`${debugPrefix}[applyDiff]: actual VDOM has ${prevPurePrimitiveElement.children.length} children, expect VDOM has ${nextPurePrimitiveElement.children.length} children`);
         }
         for (let i of _.range(commonChildrenLen)) {
             applyDiff(
-                prevPurePrimitiveElement.children[i],
-                nextPurePrimitiveElement.children[i],
+                prevPurePrimitiveElement.props.children[i],
+                nextPurePrimitiveElement.props.children[i],
                 domElement,
-                prevPurePrimitiveElement.children[i]._domElement,
+                prevPurePrimitiveElement.props.children[i]._domElement,
                 debugPrefix+'    '
             )
         }
 
-        for (let i = commonChildrenLen; i < nextPurePrimitiveElement.children.length; i ++) {
-            const childElement = nextPurePrimitiveElement.children[i];
+        for (let i = commonChildrenLen; i < nextPurePrimitiveElement.props.children.length; i ++) {
+            const childElement = nextPurePrimitiveElement.props.children[i];
             applyDiff(null, childElement, domElement, null, debugPrefix+'    ');
         }
 
-        for (let i = commonChildrenLen; i < prevPurePrimitiveElement.children.length; i ++) {
+        for (let i = commonChildrenLen; i < prevPurePrimitiveElement.props.children.length; i ++) {
             DEBUG_DOM_REMOVE(domElement, domElement.lastChild);
             domElement.removeChild(domElement.lastChild);
         }
@@ -98,9 +108,9 @@ function applyDiff(prevPurePrimitiveElement, nextPurePrimitiveElement, parentDom
             console.log(`${debugPrefix}[applyDiff]: cannot reuse, expect tag: ${nextPurePrimitiveElement.getTagName()}, actual tag: ${prevPurePrimitiveElement.getTagName()}`);
         }
         // cannot reuse the DOM
-        const newDomElement = nextPurePrimitiveElement._createDomElement();
-        nextPurePrimitiveElement._domElement = newDomElement;
-        for (const childElement of nextPurePrimitiveElement.children) {
+        const newDomElement = nextPurePrimitiveElement.__cyoCreateDomElement();
+        nextPurePrimitiveElement.__cyoDomElement = newDomElement;
+        for (const childElement of nextPurePrimitiveElement.props.children) {
             applyDiff(null, childElement, newDomElement, null, debugPrefix+'    ');
         }
         DEBUG_DOM_REPLACE(domElement.parentNode, domElement, newDomElement);
@@ -132,11 +142,11 @@ export function renderElementAndUpdateDom(element) {
 
     // v DOM before the update
     currentElement = element;
-    while (!currentElement.isPrimitive) {
-        currentElement = currentElement.renderedTo;
+    while (!currentElement.__cyoIsPrimitive) {
+        currentElement = currentElement.__cyoRenderedTo;
     }
     const prevPurePrimitiveElement = currentElement;
-    const domElement = prevPurePrimitiveElement._domElement;
+    const domElement = prevPurePrimitiveElement.__cyoDomElement;
 
     // now perform the update
     const nextPurePrimitiveElement = renderElementRecursive(element);
