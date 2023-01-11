@@ -37,9 +37,15 @@ function collectKeyedChildren(element, keyedChildren) {
 
 // try best to reuse prevElement, return the element that should be used
 function mergeElement(newElement, prevElement, prevKeyedChildren) {
+  // a element has been rendered to newElement
+  // the element was previously rendered to prevElement
+
+  // cannot merge if one of them are not element
   if (!(newElement instanceof _components.Component) || !(prevElement instanceof _components.Component)) {
     return newElement;
   }
+
+  // cannot merge if they are component, but not the same component class
   if (newElement.constructor !== prevElement.constructor) {
     return newElement;
   }
@@ -59,6 +65,7 @@ function mergeElement(newElement, prevElement, prevKeyedChildren) {
     if (_lodash["default"].isUndefined(childKey)) {
       // non-keyed-component
       while (j < prevElement.props.children.length && prevElement.props.children[j] instanceof _components.Component && !_lodash["default"].isUndefined(prevElement.props.children[j].props.key)) {
+        // skip all keyed component children since we are not keyed
         j++;
       }
       var prevChild = j < prevElement.props.children.length ? prevElement.props.children[j] : null;
@@ -67,7 +74,6 @@ function mergeElement(newElement, prevElement, prevKeyedChildren) {
     } else {
       var _prevChild = childKey in prevKeyedChildren ? prevKeyedChildren[childKey] : null;
       newChildren.push(mergeElement(newChild, _prevChild, prevKeyedChildren));
-      j++;
     }
   }
   if (prevElement.__cyoIsPrimitive) {
@@ -78,6 +84,7 @@ function mergeElement(newElement, prevElement, prevKeyedChildren) {
   prevElement.props = _objectSpread(_objectSpread({}, newElement.props), {}, {
     children: newChildren
   });
+  // TODO: define a lifecycle method so we can notify component about this property change
   return prevElement;
 }
 
@@ -140,7 +147,7 @@ function applyDiff(prevVDomElement, nextVDomElement, parentDomElement, domElemen
     if (debugApplyDiff) {
       console.log("".concat(debugPrefix, "[applyDiff]: reuse, tag is ").concat(prevPurePrimitiveElement.__cyoGetTagName()));
     }
-    // we will reuse the DOM
+    // we will reuse the physical DOM
     nextVDomElement.element.__cyoUpdateDomElement(prevVDomElement.element, domElement);
     nextVDomElement.element.__cyoDomElement = domElement;
     var commonChildrenLen = Math.min(prevVDomElement.children.length, nextVDomElement.children.length);
@@ -212,9 +219,9 @@ function renderElementAndUpdateDom(element) {
   // perform the update
   renderElementRecursive(element);
   // get the new VDOM tree
-  var vDomElement = extractVDOMTree(element);
+  var nextVDomElement = extractVDOMTree(element);
   // update physical DOM
-  applyDiff(prevVDomElement, vDomElement, prevVDomElement.__cyoDomElement);
+  applyDiff(prevVDomElement, nextVDomElement, null, prevVDomElement.__cyoDomElement);
   if (debugRenderElement) {
     console.log("[renderElementAndUpdateDom]: exit");
   }
