@@ -15,7 +15,7 @@ const eventHandlerProps = new Set(['onclick']);
  * primitive element                an element whose isPrimitive is true. They can only come from 
  *                                  NullComponent, TextComponent or PrimitiveComponent
  *                                  We also consider primitive element to be "virtual DOM"
- * _domElement                      only primitive element has _domElement, they point to the DOM 
+ * __cyoDomElement                  only primitive element has _domElement, they point to the DOM 
  *                                  element a primitive element referes to
  * 
  *              
@@ -23,7 +23,6 @@ const eventHandlerProps = new Set(['onclick']);
  */
 
 export class Component {
-    __cyoLastRender = {}             // the return from the latest render() method
     __cyoIsPrimitive = false;        // true for primitive element
     __cyoRenderedBy = null;          // other element that produce this element via render()
     __cyoRenderedTo = null;          // the element this element renders to via render()
@@ -148,6 +147,12 @@ function _primitiveComponent(tag) {
             return tag;
         }
 
+        __cyoGetPhysicalProps() {
+            return Object.entries(this.props).filter(
+                ([k, v]) => (k !=='children' && k !== 'key')
+            );
+        }
+    
         __cyoSetDomAttr(domElement, attrName, attrValue) {
             DEBUG_DOM_ATTR_SET(domElement, attrName, attrValue);
             if (eventHandlerProps.has(attrName)) {
@@ -169,33 +174,37 @@ function _primitiveComponent(tag) {
         __cyoCreateDomElement() {
             DEBUG_DOM_CREATE(tag);
             const domElement = document.createElement(tag);
-            for (const key in this.props) {
-                this.__cyoSetDomAttr(domElement, key, this.props[key]);
-            }
+            this.__cyoGetPhysicalProps().forEach(([propKey, propValue]) => {
+                this.__cyoSetDomAttr(domElement, propKey, propValue);
+            });
             return domElement;
         }
 
         __cyoUpdateDomElement(cachedElement, domElement) {
-            const prevPropKeys = new Set(Object.keys(cachedElement.props));
-            const propKeys = new Set(Object.keys(this.props));
+            const cachedPropKeys = new Set(
+                cachedElement.__cyoGetPhysicalProps().map(([propKey, propValue]) => propKey)
+            );
+            const propKeys = new Set(
+                this.__cyoGetPhysicalProps().map(([propKey, propValue]) => propKey)
+            );
 
-            for (let key of Object.keys(cachedElement.props)) {
-                if (!propKeys.has(key)) {
-                    this.__cyoRemoveDomAttr(domElement, key);
+            cachedElement.__cyoGetPhysicalProps().forEach(([propKey, propValue]) => {
+                if (!propKeys.has(propKey)) {
+                    this.__cyoRemoveDomAttr(domElement, propKey);
                 }
-            }
+            });
 
-            for (let key of Object.keys(this.props)) {
-                const value = this.props[key];
-                if (prevPropKeys.has(key)) {
-                    if (cachedElement.props[key] !== value) {
-                        this.__cyoSetDomAttr(domElement, key, value);
+            this.__cyoGetPhysicalProps().forEach(([propKey, propValue]) => {
+                if (cachedPropKeys.has(propKey)) {
+                    if (cachedElement.props[propKey] !== propValue) {
+                        this.__cyoSetDomAttr(domElement, propKey, propValue);
                     }
                 } else {
-                    this.__cyoSetDomAttr(domElement, key, value);
+                    this.__cyoSetDomAttr(domElement, propKey, propValue);
                 }
-            }
+            });
         }
+
         render() {
             throw new Error("render should never be called on primitive element!");
         }

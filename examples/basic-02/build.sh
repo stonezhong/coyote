@@ -1,5 +1,4 @@
 #!/bin/sh
-
 rm -rf js/coyote
 mkdir js/coyote
 cp ../../src/*.js js/coyote/

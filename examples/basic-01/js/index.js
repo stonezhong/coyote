@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import {Component, componentFactory, renderRootDomElement} from "../../../src";
-import {DIV, P, BUTTON} from "../../../src";
+import {Component, componentFactory, renderRootDomElement} from "./coyote";
+import {DIV, P, BUTTON} from "./coyote";
 
 const COLORS = ['green', 'red'];
 const MyPage = componentFactory(class MyPage extends Component {
