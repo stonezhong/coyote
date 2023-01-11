@@ -2,6 +2,10 @@
 
 Coyote is a react-like javascript UI library. It is very lightweight. Here is a brief comparison. A real example is at [here](https://github.com/stonezhong/coyote/tree/main/examples/basic-01). You can see a live demo at [codesandbox](https://codesandbox.io/s/autumn-darkness-qbx0zh?file=/src/index.js).
 
+More Examples:
+* [Getting started](https://codesandbox.io/s/autumn-darkness-qbx0zh?file=/src/index.js)
+* [Use key attribute to preserve state](https://codesandbox.io/s/icy-sun-xwfcc1?file=/src/index.js)
+
 # Compare coyote against react
 ## Overall
 ### coyote
